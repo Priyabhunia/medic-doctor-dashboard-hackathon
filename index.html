@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard System</title>
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --bg-secondary: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --text-color: white;
+            --text-secondary: #ccc;
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #f8f6f0 0%, #f0ede6 100%);
+            --bg-secondary: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-color: #333;
+            --text-secondary: #666;
+            --input-bg: rgba(0, 0, 0, 0.02);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .container {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        .selection-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .selection-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 40px 60px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .selection-btn:hover {
+            background: var(--border-color);
+            transform: scale(1.05);
+        }
+
+        .dashboard-header {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .appointment-item {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .patient-info {
+            flex: 1;
+            text-align: left;
+            margin-right: 20px;
+        }
+
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .appointment-time {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .room-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .video-call-btn {
+            background: rgba(0, 150, 0, 0.3);
+            border: 2px solid rgba(0, 200, 0, 0.5);
+        }
+
+        .accept-btn {
+            background: rgba(0, 150, 0, 0.3);
+            border: 2px solid rgba(0, 200, 0, 0.5);
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .decline-btn {
+            background: rgba(150, 0, 0, 0.3);
+            border: 2px solid rgba(200, 0, 0, 0.5);
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .medicine-form {
+            text-align: left;
+        }
+
+        .medicine-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: end;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-column label {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-column input {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-column input:focus {
+            outline: none;
+            border-color: rgba(100, 150, 255, 0.5);
+            background: var(--bg-secondary);
+        }
+
+        .medicine-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .add-another-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .add-another-btn:hover {
+            background: var(--border-color);
+        }
+
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-form div {
+            margin-bottom: 20px;
+        }
+
+        .profile-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .profile-form input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-form input:focus {
+            outline: none;
+            border-color: rgba(100, 150, 255, 0.5);
+            background: var(--bg-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .appointment-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .patient-info {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .form-grid,
+            .medicine-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+
+    <!-- Page 1: Landing Page -->
+    <div id="page1" class="page active">
+        <div class="container">
+            <h1 style="margin-bottom: 30px;">Medical System</h1>
+            <p style="margin-bottom: 30px; color: var(--text-secondary);">Welcome to the medical management system</p>
+            <button class="btn" onclick="goToPage('page2')">Enter System</button>
+        </div>
+    </div>
+
+    <!-- Page 2: Selection Page -->
+    <div id="page2" class="page">
+        <button class="back-btn" onclick="goToPage('page1')">← Back</button>
+        <div class="container">
+            <h2 style="margin-bottom: 40px;">Select Service</h2>
+            <div class="selection-container">
+                <div class="selection-btn" onclick="goToPage('page4')">
+                    <div>medicine</div>
+                    <div>store</div>
+                </div>
+                <div class="selection-btn" onclick="goToPage('page5')">
+                    <div>doctor</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 3: Doctor Dashboard -->
+    <div id="page3" class="page">
+        <button class="back-btn" onclick="goToPage('page5')">← Back</button>
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Doctor Notification Dashboard</h2>
+            </div>
+
+            <div class="appointment-item">
+                <div class="patient-info">
+                    <div class="patient-name">Priyo Bhunia</div>
+                    <div class="appointment-time">6:00 PM</div>
+                    <div class="room-info">Room Name: 54324</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn video-call-btn" onclick="startVideoCall('54324')">Video Call</button>
+                </div>
+            </div>
+
+            <div class="appointment-item">
+                <div class="patient-info">
+                    <div class="patient-name">Debjot</div>
+                    <div class="appointment-time">6:01 PM</div>
+                    <div class="room-info">Room Name: 95345</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn video-call-btn" onclick="startVideoCall('95345')">Video Call</button>
+                </div>
+            </div>
+
+            <div class="appointment-item">
+                <div class="patient-info">
+                    <div class="patient-name">Request from Ram</div>
+                    <div class="appointment-time">Appointment Request</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn accept-btn" onclick="acceptAppointment('Ram')">Accept</button>
+                    <button class="btn decline-btn" onclick="declineAppointment('Ram')">Decline</button>
+                </div>
+            </div>
+
+            <div class="appointment-item">
+                <div class="patient-info">
+                    <div class="patient-name">Request from Sam</div>
+                    <div class="appointment-time">Appointment Request</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn accept-btn" onclick="acceptAppointment('Sam')">Accept</button>
+                    <button class="btn decline-btn" onclick="declineAppointment('Sam')">Decline</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: Medicine Store -->
+    <div id="page4" class="page">
+        <button class="back-btn" onclick="goToPage('page2')">← Back</button>
+        <div class="container">
+            <div class="medicine-form">
+                <h2>Add Medicine</h2>
+                
+                <div class="form-grid">
+                    <div class="form-column">
+                        <label>Medicine name</label>
+                        <input type="text" placeholder="Enter medicine name">
+                    </div>
+                    <div class="form-column">
+                        <label>Medicine description</label>
+                        <input type="text" placeholder="Enter description">
+                    </div>
+                    <div class="form-column">
+                        <label>Medicine Price</label>
+                        <input type="number" placeholder="Enter price">
+                    </div>
+                    <div class="form-column">
+                        <label>something else(beta)</label>
+                        <input type="text" placeholder="Enter details">
+                    </div>
+                </div>
+
+                <div id="medicineRows"></div>
+
+                <button class="add-another-btn" onclick="addMedicineRow()">⊕ Add Another</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 5: Doctor Profile Setup -->
+    <div id="page5" class="page">
+        <button class="back-btn" onclick="goToPage('page2')">← Back</button>
+        <div class="container">
+            <div style="display: flex; gap: 40px; align-items: stretch; min-height: 400px;">
+                <div style="flex: 1; text-align: left;">
+                    <h2 style="margin-bottom: 20px; text-align: center;">Set and modify your profile</h2>
+                    <h3 style="margin-bottom: 30px; text-align: center; color: var(--text-secondary);">(DOCTOR)</h3>
+                    
+                    <p style="margin-bottom: 30px; color: var(--text-secondary); text-align: center;">
+                        In this area doctor can set their profile and modify details
+                    </p>
+                    
+                    <div class="profile-form">
+                        <div>
+                            <label>Doctor Name</label>
+                            <input type="text" placeholder="Enter your full name">
+                        </div>
+                        
+                        <div>
+                            <label>Specialization</label>
+                            <input type="text" placeholder="e.g., Cardiology, Neurology">
+                        </div>
+                        
+                        <div>
+                            <label>Experience (Years)</label>
+                            <input type="number" placeholder="Years of experience">
+                        </div>
+                        
+                        <div>
+                            <label>Contact Number</label>
+                            <input type="tel" placeholder="Phone number">
+                        </div>
+                        
+                        <button class="btn" style="width: 100%; margin-top: 20px;">Save Profile</button>
+                    </div>
+                    
+                    <p style="margin-top: 30px; text-align: center; color: var(--text-secondary); font-size: 18px;">(beta)</p>
+                </div>
+                
+                <div style="flex: 0 0 300px; display: flex; align-items: center; justify-content: center;">
+                    <div class="selection-btn" onclick="goToPage('page3')" style="padding: 60px 40px; text-align: center; cursor: pointer;">
+                        <div style="margin-bottom: 10px;">pending</div>
+                        <div style="margin-bottom: 10px;">appointment</div>
+                        <div style="border-top: 1px solid var(--border-color); margin: 15px 0; padding-top: 15px;">video</div>
+                        <div>call</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                themeBtn.textContent = '🌙 Dark';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeBtn.textContent = '☀️ Light';
+            }
+        }
+
+        function goToPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function addMedicineRow() {
+            const container = document.getElementById('medicineRows');
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'medicine-row';
+            
+            rowDiv.innerHTML = `
+                <input type="text" placeholder="Medicine name">
+                <input type="text" placeholder="Medicine description">
+                <input type="number" placeholder="Price">
+                <input type="text" placeholder="Additional info">
+            `;
+            
+            container.appendChild(rowDiv);
+        }
+
+        function startVideoCall(roomName) {
+            alert(`Starting video call for room: ${roomName}`);
+        }
+
+        function acceptAppointment(patientName) {
+            alert(`Appointment accepted for ${patientName}`);
+        }
+
+        function declineAppointment(patientName) {
+            alert(`Appointment declined for ${patientName}`);
+        }
+    </script>
+</body>
+</html>
