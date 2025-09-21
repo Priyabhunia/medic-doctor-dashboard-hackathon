@@ -38,6 +38,7 @@
             justify-content: center;
             align-items: center;
             transition: all 0.3s ease;
+            padding: 10px;
         }
 
         .theme-toggle {
@@ -164,6 +165,26 @@
             color: var(--text-secondary);
             font-size: 14px;
             margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .copy-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--border-color);
         }
 
         .action-buttons {
@@ -216,7 +237,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
             align-items: end;
@@ -251,7 +272,7 @@
 
         .medicine-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -303,19 +324,39 @@
             background: var(--bg-secondary);
         }
 
+        /* Enhanced Mobile Responsiveness */
         @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
             .container {
                 padding: 20px;
+                margin: 0 5px;
             }
             
             .appointment-item {
                 flex-direction: column;
                 text-align: center;
+                padding: 15px;
             }
             
             .patient-info {
                 margin-right: 0;
                 margin-bottom: 15px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .room-info {
+                justify-content: center;
+                margin-top: 10px;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
             }
 
             .form-grid,
@@ -330,6 +371,98 @@
                 padding: 8px 12px;
                 font-size: 12px;
             }
+
+            .back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .selection-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .selection-btn {
+                padding: 30px 40px;
+                min-width: 200px;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 14px;
+                margin: 8px;
+            }
+
+            .patient-name {
+                font-size: 16px;
+            }
+
+            .page {
+                padding: 10px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 20px;
+            }
+
+            .medicine-form h2 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .appointment-item {
+                padding: 12px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 13px;
+                margin: 5px;
+            }
+
+            .selection-btn {
+                padding: 25px 30px;
+                font-size: 16px;
+            }
+
+            .copy-btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+
+            .theme-toggle {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Profile page mobile adjustments */
+        @media (max-width: 768px) {
+            #page5 .container > div {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+
+            #page5 .selection-btn {
+                padding: 40px 30px !important;
+                width: 100% !important;
+                max-width: 250px !important;
+                margin: 0 auto !important;
+            }
         }
     </style>
 </head>
@@ -339,9 +472,9 @@
     <!-- Page 1: Landing Page -->
     <div id="page1" class="page active">
         <div class="container">
-            <h1 style="margin-bottom: 30px;">Doctor and Medicine shop Dashboard</h1>
+            <h1 style="margin-bottom: 30px;">Medical System</h1>
             <p style="margin-bottom: 30px; color: var(--text-secondary);">Welcome to the medical management system</p>
-            <button class="btn" onclick="goToPage('page2')">Bcome a host</button>
+            <button class="btn" onclick="goToPage('page2')">Enter System</button>
         </div>
     </div>
 
@@ -374,10 +507,15 @@
                 <div class="patient-info">
                     <div class="patient-name">Priyo Bhunia</div>
                     <div class="appointment-time">6:00 PM</div>
-                    <div class="room-info">Room Name: 54324</div>
+                    <div class="room-info">
+                        Room Name: 54324
+                        <button class="copy-btn" onclick="copyToClipboard('54324')">📋 Copy</button>
+                    </div>
                 </div>
                 <div class="action-buttons">
+                    <!-- Add your video call link here - replace # with your actual video call URL -->
                     <button class="btn video-call-btn" onclick="startVideoCall('54324')">Video Call</button>
+                    <!-- Video call link ends here -->
                 </div>
             </div>
 
@@ -385,10 +523,15 @@
                 <div class="patient-info">
                     <div class="patient-name">Debjot</div>
                     <div class="appointment-time">6:01 PM</div>
-                    <div class="room-info">Room Name: 95345</div>
+                    <div class="room-info">
+                        Room Name: 95345
+                        <button class="copy-btn" onclick="copyToClipboard('95345')">📋 Copy</button>
+                    </div>
                 </div>
                 <div class="action-buttons">
+                    <!-- Add your video call link here - replace # with your actual video call URL -->
                     <button class="btn video-call-btn" onclick="startVideoCall('95345')">Video Call</button>
+                    <!-- Video call link ends here -->
                 </div>
             </div>
 
@@ -536,8 +679,38 @@
             container.appendChild(rowDiv);
         }
 
+        function copyToClipboard(roomId) {
+            navigator.clipboard.writeText(roomId).then(function() {
+                // Show a temporary success message
+                const originalText = event.target.textContent;
+                event.target.textContent = '✓ Copied';
+                event.target.style.background = 'rgba(0, 150, 0, 0.3)';
+                
+                setTimeout(function() {
+                    event.target.textContent = originalText;
+                    event.target.style.background = '';
+                }, 1500);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = roomId;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const originalText = event.target.textContent;
+                event.target.textContent = '✓ Copied';
+                setTimeout(function() {
+                    event.target.textContent = originalText;
+                }, 1500);
+            });
+        }
+
         function startVideoCall(roomName) {
-            alert(`Starting video call for room: ${roomName}`);
+            // TODO: Replace this alert with your actual video call link
+            Example: window.open('https://video-app-8115-6825-dev.twil.io?passcode=23849981156825' , '_blank');
+            // alert(`Starting video call for room: ${roomName}`);
         }
 
         function acceptAppointment(patientName) {
